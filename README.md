@@ -17,15 +17,18 @@
   "forward":[
     {
       "param":"google.com",
-      "address":"127.0.0.1:6077"
+      "address":"127.0.0.1:6077",
+      "host":"targeA.host.com"
     },
     {
       "param":"ss.proxy.com",
-      "address":"186.168.188.166:6088"
+      "address":"186.168.188.166:6088",
+      "host":""
     },
     {
       "param":"ssr.proxy.com",
-      "address":"186.168.188.166:6099"
+      "address":"186.168.188.166:6099",
+      "host":"targeB.host.com"
     }
   ]
 }

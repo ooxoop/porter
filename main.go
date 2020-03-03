@@ -9,6 +9,7 @@ import (
 	"flag"
 	"os"
 	"encoding/json"
+	"bytes"
 )
 
 var (
@@ -22,6 +23,7 @@ type Config struct {
 	Forward []struct {
 		Param string `json:"param"`
 		Address string `json:"address"`
+		Host string `json:"host"`
 	} `json:"forward"`
 }
 
@@ -40,6 +42,8 @@ func usage() {
 func main() {
 	flag.Parse()
 	readJson()
+
+	//fmt.Println([]byte("\r\n")[0])
 
 	listen, err := net.Listen("tcp", c.Listen)
 	if err != nil {
@@ -68,6 +72,7 @@ func handler(conn net.Conn, address string) {
 		return
 	}
 
+	// fmt.Println(string(p))
 	host := strings.Split(strings.Split(strings.Split(string(p), "\r\n")[1], ": ")[1], ":")[0]
 
 	for _, f := range c.Forward {
@@ -80,6 +85,11 @@ func handler(conn net.Conn, address string) {
 			return
 		}
 		defer forward.Close()
+
+		if f.Host != "" {
+			p = HostInject(p, f.Host)
+		}
+
 		conn.SetReadDeadline(time.Time{})
 		fmt.Println("[", f.Param, "] ---> ", f.Address)
 		forward.Write(p)
@@ -87,6 +97,28 @@ func handler(conn net.Conn, address string) {
 		go io.Copy(forward, conn)
 		io.Copy(conn, forward)
 	}
+}
+
+func HostInject(p []byte, host string) []byte {
+	var i int
+	flag := 0
+	for i=0; i<len(p); i++ {
+		if p[i] == 13 && p[i+1] == 10 {
+			flag++
+		}
+		if flag == 2 {
+			flag = i-1
+			break
+		}
+	}
+	strs := strings.Split(string(p[:i]), "\r\n")
+	strs[1] = "Host: " + host
+	b := []byte(strings.Join(strs, "\r\n"))
+	return BytesCombine(b, p[i:])
+}
+
+func BytesCombine(pBytes ...[]byte) []byte {
+    return bytes.Join(pBytes, []byte(""))
 }
 
 func getFirstPacket(conn net.Conn) ([]byte, error) {

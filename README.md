@@ -35,12 +35,15 @@
 
 #### 使用场景举例
 ##### ss/ssr单端口多用户
-环境：shadowsocks-libev+obfs(http)服务端 or shadowsocksr(http_simple混淆)服务端
+环境：shadowsocks-libev+obfs(http)服务端 or shadowsocksr(http_simple混淆)服务端</br></br>
 配置文件参数说明：
+```
 listen - 程序监听的端口
 param - ss/ssr客户端填写的混淆参数
 address - ss/ssr服务端的地址和端口(可以本地地址也可以远程地址)
 host - 留空(本场景不需要使用该参数)
-最后，客户端配置上将地址和端口更改为本程序的地址和端口，混淆参数设置为配置文件中forward.param含有的混淆，即可成功连接目标ss/ssr服务端
+```
+</br>
+最后，客户端配置上将地址和端口更改为本程序的地址和端口，混淆参数设置为配置文件中forward.param含有的混淆，即可成功连接目标ss/ssr服务端</br>
 
 

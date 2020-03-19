@@ -6,7 +6,7 @@
 
 #### 运行参数
 ```
--config 指定配置文件名(default：config.json)
+-config 指定配置文件名(default：config.json);也可以指定远程地址(example: http://rss.example.com/config),当指定远程地址的时候，每分钟请求一次更新配置参数
 -l 指定监听的端口(default：8080)
 ```
 

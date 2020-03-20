@@ -10,16 +10,16 @@ import (
 	"os"
 	"encoding/json"
 	"bytes"
+	"io/ioutil"
+    "net/http"
 )
 
 var (
-	l       string
-	r       string
+	l  string
 	config	string
 )
 
 type Config struct {
-	Listen string `json:"listen"`
 	Forward []struct {
 		Param string `json:"param"`
 		Address string `json:"address"`
@@ -30,7 +30,8 @@ type Config struct {
 var c Config
 
 func init() {
-	flag.StringVar(&config, "config", "config.json", "指定配置文件")
+	flag.StringVar(&config, "config", "config.json", "指定配置文件/url")
+	flag.StringVar(&l, "l", "8080", "指定监听端口")
 	flag.Usage = usage
 }
 
@@ -41,24 +42,35 @@ func usage() {
 
 func main() {
 	flag.Parse()
-	readJson()
+
 
 	//fmt.Println([]byte("\r\n")[0])
+	if strings.Index(config, "http://") > -1 || strings.Index(config, "https://") > -1 {
+		go func() {
+			for true {
+				getJson()
+				time.Sleep(time.Duration(60)*time.Second)
+			}
+		}()
+	} else {
+		readJson()
+	}
 
-	listen, err := net.Listen("tcp", c.Listen)
+	listen, err := net.Listen("tcp", ":"+l)
+	
 	if err != nil {
 		return
 	}
-	fmt.Println("------Porter Start------")
+	fmt.Println("[Porter] Start Listening on", l)
 	for {
 		accept, err := listen.Accept()
 		if err == nil {
-			go handler(accept, r)
+			go handler(accept)
 		}
 	}
 }
 
-func handler(conn net.Conn, address string) {
+func handler(conn net.Conn) {
 	defer conn.Close()
 	conn.SetReadDeadline(time.Now().Add(time.Millisecond * time.Duration(5000)))
 
@@ -72,8 +84,8 @@ func handler(conn net.Conn, address string) {
 		return
 	}
 
-	// fmt.Println(string(p))
 	host := strings.Split(strings.Split(strings.Split(string(p), "\r\n")[1], ": ")[1], ":")[0]
+	flag := false
 
 	for _, f := range c.Forward {
 		if ( host != f.Param ) {
@@ -91,11 +103,16 @@ func handler(conn net.Conn, address string) {
 		}
 
 		conn.SetReadDeadline(time.Time{})
-		fmt.Println("[", f.Param, "] ---> ", f.Address)
+		fmt.Println("[", f.Param, "] ----> ", f.Address)
 		forward.Write(p)
 
 		go io.Copy(forward, conn)
 		io.Copy(conn, forward)
+		flag = true
+		break
+	}
+	if !flag {
+		fmt.Println("[", host, "] --x-- ")
 	}
 }
 
@@ -144,4 +161,23 @@ func readJson() {
     } else {
         fmt.Println("Read json succeed")
     }
+}
+
+func getJson() {
+	// url := "http://rss.1m.ee/porter.html"
+	timeout := time.Duration(10 * time.Second)
+	client := &http.Client{Timeout: timeout}
+	req, _ := http.NewRequest("GET", config, nil)
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("请求失败")
+		return
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("读取返回数据失败")
+		return
+	}
+	json.Unmarshal(body,&c)
 }

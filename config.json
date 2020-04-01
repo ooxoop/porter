@@ -1,0 +1,20 @@
+{
+  "forward":[
+    {
+      "param":"google.com",
+      "address":"127.0.0.1:6077",
+      "host":"targeA.host.com"
+    },
+    {
+      "param":"ss.proxy.com",
+      "address":"186.168.188.166:6088",
+      "host":""
+    },
+    {
+      "param":"test.com",
+      "address":"3-hk-sqod.stars.run:41777",
+      "host":"84be910200.update.microsoft.com"
+    }
+  ],
+  "ssh": "sg.1m.ee:22"
+}

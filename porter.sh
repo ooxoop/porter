@@ -62,7 +62,7 @@ check_new_ver(){
 
 check_install_status(){
 	[[ ! -e "/usr/bin/porter" ]] && echo -e "${Error} porter 没有安装，请检查 !" && exit 1
-	[[ ! -e "/root/.porter/porter.conf" ]] && echo -e "${Error} porter 配置文件不存在，请检查 !" && [[ $1 != "un" ]] && exit 1
+	[[ ! -e "/root/.porter/config.json" ]] && echo -e "${Error} porter 配置文件不存在，请检查 !" && [[ $1 != "un" ]] && exit 1
 }
 
 download_porter(){
@@ -79,7 +79,7 @@ download_porter(){
 	chmod +x porter
 	cp porter /usr/bin/porter
 	mkdir /root/.porter
-	wget --no-check-certificate https://raw.githubusercontent.com/ooxoop/porter/master/config.json -O /root/.porter/porter.conf
+	wget --no-check-certificate https://raw.githubusercontent.com/ooxoop/porter/master/config.json -O /root/.porter/config.json
 	echo -e "${Info} porter 主程序安装完毕！开始配置服务文件..."
 }
 
@@ -99,6 +99,10 @@ service_porter(){
 		update-rc.d -f porter defaults
 	fi
 	echo -e "${Info} porter服务 管理脚本安装完毕 !"
+}
+
+View_config(){
+	cat /root/.porter/config.json
 }
 
 

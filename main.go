@@ -25,6 +25,7 @@ type Config struct {
 		Address string `json:"address"`
 		Host string `json:"host"`
 	} `json:"forward"`
+	SSH string `json:"ssh"`
 }
 
 var c Config
@@ -79,6 +80,12 @@ func handler(conn net.Conn) {
 		fmt.Println("fail to get first packet")
 		return
 	}
+
+	if ( string(p)[:3] == "SSH" ) {   
+		fmt.Println("SSH packet")
+		sshForward(conn, p)
+		return
+	}
 	if ( strings.Index(string(p), "Host") < 0) {
 		fmt.Println("not a http packet")
 		return
@@ -114,6 +121,19 @@ func handler(conn net.Conn) {
 	if !flag {
 		fmt.Println("[", host, "] --x-- ")
 	}
+}
+
+func sshForward(conn net.Conn, p []byte) {
+	forward, err := net.Dial("tcp", c.SSH)
+	if err != nil {
+		fmt.Println("connect failed: ", err)
+		return
+	}
+	defer forward.Close()
+	conn.SetReadDeadline(time.Time{})
+	forward.Write(p)
+	go io.Copy(forward, conn)
+	io.Copy(conn, forward)
 }
 
 func HostInject(p []byte, host string) []byte {
@@ -164,7 +184,6 @@ func readJson() {
 }
 
 func getJson() {
-	// url := "http://rss.1m.ee/porter.html"
 	timeout := time.Duration(10 * time.Second)
 	client := &http.Client{Timeout: timeout}
 	req, _ := http.NewRequest("GET", config, nil)

@@ -145,7 +145,7 @@ Restart_porter(){
 
 
 echo && echo -e " porter 一键安装管理脚本beta ${Red_font_prefix}[v${sh_ver}]${Font_color_suffix}
- -- ooxoop | lajiblog.com --
+ -- 四分体 | sifenti.com --
 
 ${Green_font_prefix} 1.${Font_color_suffix} 安装 porter
 ${Green_font_prefix} 2.${Font_color_suffix} 卸载 porter

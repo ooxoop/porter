@@ -138,7 +138,7 @@ echo && echo -e " porter 一键安装管理脚本beta ${Red_font_prefix}[v${sh_v
  -- ooxoop | lajiblog.com --
 
 ${Green_font_prefix} 1.${Font_color_suffix} 安装 porter
-${Green_font_prefix} 2.${Font_color_suffix} 卸载 gost
+${Green_font_prefix} 2.${Font_color_suffix} 卸载 porter
 ————————————
 ${Green_font_prefix} 3.${Font_color_suffix} 启动 porter
 ${Green_font_prefix} 4.${Font_color_suffix} 停止 porter

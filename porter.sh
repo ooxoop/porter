@@ -79,20 +79,20 @@ download_porter(){
 	chmod +x porter
 	cp porter /usr/bin/porter
 	mkdir /root/.porter
-	wget --no-check-certificate https://raw.githubusercontent.com/ooxoop/porter-install/master/config.json -O /root/.porter/porter.conf
+	wget --no-check-certificate https://raw.githubusercontent.com/ooxoop/porter/master/config.json -O /root/.porter/porter.conf
 	echo -e "${Info} porter 主程序安装完毕！开始配置服务文件..."
 }
 
 service_porter(){
 	if [[ ${release} = "centos" ]]; then
-		if ! wget --no-check-certificate https://raw.githubusercontent.com/ooxoop/porter-install/master/porter_centos.service -O /etc/init.d/porter; then
+		if ! wget --no-check-certificate https://raw.githubusercontent.com/ooxoop/porter/master/porter_centos.service -O /etc/init.d/porter; then
 			echo -e "${Error} porter服务 管理脚本下载失败 !" && exit 1
 		fi
 		chmod +x /etc/init.d/porter
 		chkconfig --add porter
 		chkconfig porter on
 	else
-		if ! wget --no-check-certificate https://raw.githubusercontent.com/ooxoop/porter-install/master/porter_debian.service -O /etc/init.d/porter; then
+		if ! wget --no-check-certificate https://raw.githubusercontent.com/ooxoop/porter/master/porter_debian.service -O /etc/init.d/porter; then
 			echo -e "${Error} porter服务 管理脚本下载失败 !" && exit 1
 		fi
 		chmod +x /etc/init.d/porter
@@ -108,6 +108,12 @@ Install_porter(){
 	download_porter
 	service_porter
 	echo -e "porter 已安装完成！请重新运行脚本进行配置~"
+}
+
+Remove_porter(){
+	Stop_porter
+	rm -rf "$Folder" && rm -rf /root/.porter && rm -rf /etc/init.d/porter
+	echo -e "${Info} gost 已卸载完成！"
 }
 
 Start_porter(){
@@ -165,7 +171,7 @@ case "$num" in
 	Install_porter
 	;;
 	2)
-	Uninstall_porter
+	Remove_porter
 	;;
 	3)
 	Start_porter
@@ -190,5 +196,7 @@ case "$num" in
 	echo "请输入正确数字 [0-10]"
 	;;
 esac
+
+
 
 
